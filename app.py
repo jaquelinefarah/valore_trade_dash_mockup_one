@@ -122,9 +122,4 @@ st.write("")  # repit por for space
 st.header("Open & Close Price Candlestick")
 show_candlestick_chart_plotly(df_full, analysis_start, analysis_end, analysis_label)
 
-# Short interest
-st.write("")
-st.write("")  # repit por for space
-st.header("Short Interest Over Time")
 
-analysis_df, analysis_label, analysis_start, analysis_end = get_analysis_period_filter(df_full)
