@@ -1,41 +1,37 @@
-
 # 📊 ValOre Trading Insights
 
-Este é um dashboard interativo desenvolvido em **Streamlit** para visualizar dados de mercado da ValOre, incluindo:
+This is an interactive dashboard built with **Streamlit** to visualize market data for ValOre, including:
 
-- Destaques semanais com KPIs de volume, bucket e VWAP
-- Tabelas de benchmarks de mercado
-- Análises de bucket por faixa de preço
-- Distribuição por corretora (Exchange Pie Chart)
-- Gráficos de volume, preço, candlestick e short interest
+- Weekly highlights with KPIs on volume, price buckets, and VWAP
+- Market benchmark tables
+- Price bucket analysis (Top 5 ranges)
+- Exchange distribution (Pie Chart)
+- Charts for price, volume, candlestick, and short interest
 
 ---
 
-## 🚀 Como executar
+## 🚀 How to Run
 
-1. Clone o repositório ou acesse o app diretamente via [Streamlit Cloud](https://streamlit.io/cloud)
-2. Execute localmente com:
+1. Clone the repository or access the app directly via [Streamlit Cloud](https://streamlit.io/cloud)
+2. To run locally:
 ```bash
 streamlit run app.py
-```
+📦 Requirements
+All required libraries are listed in requirements.txt, including:
 
----
+streamlit
 
-## 📦 Requisitos
+pandas
 
-As bibliotecas usadas estão listadas em [`requirements.txt`](./requirements.txt), incluindo:
+numpy
 
-- streamlit
-- pandas
-- numpy
-- plotly
-- altair
+plotly
 
----
+altair
 
-## 📁 Estrutura do Projeto
-
-```
+📁 Project Structure
+Copy
+Edit
 valore_dashboard/
 ├── app.py
 ├── requirements.txt
@@ -43,12 +39,7 @@ valore_dashboard/
 │   └── ...
 ├── utils/
 │   └── ...
-```
+✨ About
+This project is part of a strategic data analysis initiative for ValOre Metals, designed to make it easier to identify relevant market patterns and trading behavior over time.
 
----
-
-## ✨ Sobre
-
-Este projeto é parte de uma análise estratégica de dados da ValOre Metals, com foco em facilitar a leitura de padrões e movimentos relevantes do mercado ao longo do tempo.
-
-Desenvolvido com 💙 por Jaqueline Farah.
+Developed with 💙 by Jaqueline Farah.
