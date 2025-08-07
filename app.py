@@ -128,5 +128,3 @@ st.write("")  # repit por for space
 st.header("Short Interest Over Time")
 
 analysis_df, analysis_label, analysis_start, analysis_end = get_analysis_period_filter(df_full)
-
-show_short_interest_chart(analysis_df, analysis_start, analysis_end, analysis_label)
