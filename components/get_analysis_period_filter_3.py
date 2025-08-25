@@ -24,4 +24,5 @@ def get_analysis_period_filter(df_full):
         analysis_df = df_full[df_full["date"] >= analysis_start].copy()
         analysis_label = f"Last {option.lower()}"
 
-    return analysis_df, analysis_label, analysis_start, analysis_end
+    # Agora retornando também o option (period_key)
+    return analysis_df, analysis_label, analysis_start, analysis_end, option

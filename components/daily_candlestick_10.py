@@ -1,74 +1,77 @@
-import streamlit as st 
+import streamlit as st
 import plotly.graph_objects as go
-import pandas as pd
 
-def show_candlestick_chart_plotly(df_full, start_date, end_date, period_label="Selected Period"):
-    # Garantir formato e ordenação da data
-    df = df_full[df_full["close"].notna()].copy()
-    df["date"] = pd.to_datetime(df["date"]).dt.date
-    df = df.sort_values("date")
+def show_candlestick_with_neutral(df_filtered, start_date, end_date, period_label="Selected Period"):
+    # 1. Filtrar período
+    df_period = df_filtered.copy()
+    df_period = df_period[(df_period["date"] >= start_date) & (df_period["date"] <= end_date)]
 
-    # Filtrar período
-    df_filtered = df[(df["date"] >= start_date.date()) & (df["date"] <= end_date.date())]
+    if df_period.empty:
+        st.warning("⚠️ No data available for the selected period.")
+        return
 
-    # Agregar por dia
-    df_daily = df_filtered.groupby("date").agg({
+    # 2. Agregar por dia (OHLC)
+    df_daily = df_period.groupby("date").agg({
         "open": "first",
         "high": "max",
         "low": "min",
         "close": "last"
     }).reset_index()
 
-    # Criar gráfico
-    fig = go.Figure()
-
-    # Candlestick principal (sem legenda automática)
-    fig.add_trace(go.Candlestick(
-        x=df_daily['date'],
-        open=df_daily['open'],
-        high=df_daily['high'],
-        low=df_daily['low'],
-        close=df_daily['close'],
-        increasing_line_color='green',
-        decreasing_line_color='red',
-        showlegend=False
-    ))
-
-    # Legenda customizada com traços invisíveis
-    fig.add_trace(go.Scatter(
-        x=[None],
-        y=[None],
-        mode='markers',
-        marker=dict(size=10, color='green', symbol='square'),
-        name='Price Up (Open < Close)'
-    ))
-    fig.add_trace(go.Scatter(
-        x=[None],
-        y=[None],
-        mode='markers',
-        marker=dict(size=10, color='red', symbol='square'),
-        name='Price Down (Open > Close)'
-    ))
-
-    # Layout com legenda
-    fig.update_layout(
-        title=f"Open & Close Price Candlestick – {period_label}",
-        xaxis_title="Date",
-        yaxis_title="Price ($ CAD)",
-        xaxis_rangeslider_visible=False,
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        height=600,
-        margin=dict(l=0, r=0, t=50, b=0),
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.25,
-            xanchor="center",
-            x=0.5,
-            font=dict(size=14)
-        )
+    # 3. Definir variação e classificar
+    tolerance = 0.03  # 2% tolerance
+    df_daily["variation"] = (df_daily["close"] - df_daily["open"]) / df_daily["open"]
+    df_daily["type"] = df_daily["variation"].apply(
+        lambda x: "neutral" if abs(x) <= tolerance else ("up" if x > 0 else "down")
     )
 
+    # 4. Separar datasets
+    df_up = df_daily[df_daily["type"] == "up"]
+    df_down = df_daily[df_daily["type"] == "down"]
+    df_neutral = df_daily[df_daily["type"] == "neutral"]
+
+    # 5. Criar figura
+    fig = go.Figure()
+
+    # Alta (verde)
+    if not df_up.empty:
+        fig.add_trace(go.Candlestick(
+            x=df_up["date"], open=df_up["open"], high=df_up["high"],
+            low=df_up["low"], close=df_up["close"],
+            increasing_line_color="green", decreasing_line_color="green",
+            showlegend=False
+        ))
+
+    # Baixa (vermelho)
+    if not df_down.empty:
+        fig.add_trace(go.Candlestick(
+            x=df_down["date"], open=df_down["open"], high=df_down["high"],
+            low=df_down["low"], close=df_down["close"],
+            increasing_line_color="red", decreasing_line_color="red",
+            showlegend=False
+        ))
+
+    # Neutro (cinza)
+    if not df_neutral.empty:
+        fig.add_trace(go.Candlestick(
+            x=df_neutral["date"], open=df_neutral["open"], high=df_neutral["high"],
+            low=df_neutral["low"], close=df_neutral["close"],
+            increasing_line_color="gray", decreasing_line_color="gray",
+            showlegend=False
+        ))
+
+    fig.update_layout(
+    title=dict(
+        text=f"Price Candlestick – {period_label} ending on {end_date.strftime('%Y-%m-%d')}",
+        font=dict(size=20)
+    ),
+    xaxis_title="Date",
+    yaxis_title="Price ($ CAD)",
+    xaxis_rangeslider_visible=False,
+    height=500
+)
+
+
+    # 6. Exibir no Streamlit
+    
     st.plotly_chart(fig, use_container_width=True)
