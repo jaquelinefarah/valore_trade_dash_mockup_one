@@ -1,24 +1,20 @@
+from datetime import timedelta
 import pandas as pd
 
 def get_last_closed_week(df_full):
-    # Ensure the 'date' column is in datetime format
+    """
+    Retorna a última semana fechada (segunda a sexta) e o dataframe filtrado.
+    """
     df_full["date"] = pd.to_datetime(df_full["date"])
+    max_date = pd.to_datetime(df_full["date"].max())  # garante tipo datetime
 
-    # Identify the last available business day (Monday–Friday) in the dataset
-    last_date = df_full["date"].max()
+    # Encontra a última sexta-feira <= max_date
+    weekday = max_date.weekday()
+    last_friday = max_date - timedelta(days=(weekday - 4) % 7)
+    last_monday = last_friday - timedelta(days=4)
 
-    # Get the last 5 business days up to and including last_date
-    last_week_days = pd.bdate_range(end=last_date, periods=5)
+    mask = (df_full["date"] >= last_monday) & (df_full["date"] <= last_friday)
+    filtered_df = df_full.loc[mask].copy()
 
-    # Define start and end of the last full business week
-    start_week = last_week_days[0]
-    end_week = last_week_days[-1]
-
-    # Create a label for display (e.g., "Jul 22 – 26, 2025")
-    label = f"{start_week.strftime('%b %d')} – {end_week.strftime('%d, %Y')}"
-
-    # Filter the DataFrame to include only the 5 business days of the week
-    df_filtered = df_full[df_full["date"].isin(last_week_days)].copy()
-
-    return df_filtered, label, start_week, end_week
-
+    label = f"{last_monday.strftime('%b %d')} - {last_friday.strftime('%b %d, %Y')}"
+    return filtered_df, label, last_monday, last_friday
